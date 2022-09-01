@@ -95,4 +95,3 @@ class ApplyModelMixin(pydantic.BaseModel):
             # Ensure whatever happens here, the validate_assignment flag is reset
             # to its original value.
             self.__config__.validate_assignment = had_validate_assignment
-

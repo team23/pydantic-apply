@@ -117,7 +117,7 @@ def test_apply_will_handle_inner_apply_model():
     inner_with_apply = obj.inner_with_apply
 
     obj.apply({
-        "inner_with_apply": PatchModel(b=1)
+        "inner_with_apply": PatchModel(b=1),
     })
 
     assert obj.inner_with_apply.a == 1
@@ -130,7 +130,7 @@ def test_apply_will_handle_inner_apply_model_with_validate_assignment():
     inner_with_apply = obj.inner_with_apply
 
     obj.apply({
-        "inner_with_apply": PatchModel(b=1)
+        "inner_with_apply": PatchModel(b=1),
     })
 
     assert obj.inner_with_apply.a == 1
