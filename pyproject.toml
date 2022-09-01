@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "pydantic-apply"
 version = "0.1.0"
-description = "Apply changes as patches to any pydanic model."
+description = "Apply changes as patches to pydanic models."
 authors = ["TEAM23 GmbH <info@team23.de>"]
 license = "MIT"
 repository = "https://github.com/team23/pydantic-apply"
