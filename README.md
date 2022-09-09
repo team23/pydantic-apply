@@ -1,5 +1,11 @@
 # pydantic-apply
 
+## Installation
+
+Just use `pip install pydantic-apply` to install the library.
+
+## About
+
 With `pydantic-apply` you can apply changes to your pydantic models by using
 the `ApplyModelMixin` it provides:
 
@@ -27,13 +33,13 @@ only use fields that where explicitly set on the model instance. Also note
 that `.apply()` will ignore all fields not present in the model, like the
 model constructor would.
 
-## Nested models
+### Nested models
 
 `pydantic-apply` will also know how to apply changes to nested models. If those
 models are by themself subclasses of `ApplyModelMixin` it will call `apply()`
 on those fields as well. Otherwise the whole attribute will be replaced.
 
-## Apply changes when using `validate_assignment`
+### Apply changes when using `validate_assignment`
 
 When your models have `validate_assignment` enabled it may become tricky to
 apply changes to the model. This is due to the fact that you only can assign
