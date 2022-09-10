@@ -81,12 +81,21 @@ class ApplyModelMixin(pydantic.BaseModel):
                 # Run validation as if all changes were applied. We do this by creating
                 # a new (temporary) instance of the model class, just to run the
                 # validation.
-                self.__class__(
+                changed_self = self.__class__(
                     **{
                         **self.dict(),
                         **prepared_changes,
                     },
                 )
+
+                # Update the changes with the validated values we now have from the
+                # temporary instance.
+                prepared_changes = {
+                    key: value
+                    for key, value
+                    in changed_self.__dict__.items()
+                    if key in prepared_changes.keys()
+                }
 
             for field_name, field_value in prepared_changes.items():
                 setattr(self, field_name, field_value)
