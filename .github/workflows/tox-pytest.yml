@@ -1,4 +1,4 @@
-name: Run pytest using tox
+name: "TEST: Run pytest using tox"
 on: [push, pull_request]
 jobs:
   tox-pytest:
