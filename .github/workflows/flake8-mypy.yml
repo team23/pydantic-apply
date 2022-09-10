@@ -1,5 +1,5 @@
 name: Run flake8 & mypy
-on: [push]
+on: [push, pull_request]
 jobs:
   tox-pytest:
     runs-on: ubuntu-latest
@@ -15,5 +15,5 @@ jobs:
           poetry install
       - name: Lint with flake8
         run: |
-          flake8 .
-          mypy .
+          poetry run flake8 .
+          poetry run mypy .
