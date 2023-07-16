@@ -3,7 +3,11 @@ from typing import Optional
 import pydantic
 import pytest
 
+from pydantic_apply._compat import PYDANTIC_V1, PYDANTIC_V2
 from pydantic_apply.apply import ApplyModelMixin
+
+if PYDANTIC_V2:
+    from pydantic import ConfigDict
 
 
 class InnerModel(pydantic.BaseModel):
@@ -23,8 +27,12 @@ class ApplyModel(ApplyModelMixin, pydantic.BaseModel):
     inner: Optional[InnerModel] = None
     inner_with_apply: Optional[InnerWithApplyModel] = None
 
-    class Config:
-        allow_population_by_field_name = True
+    if PYDANTIC_V1:
+        class Config:
+            allow_population_by_field_name = True
+
+    if PYDANTIC_V2:
+        model_config = ConfigDict(populate_by_name=True)
 
 
 class ApplyModelWithValidation(ApplyModel):
@@ -34,8 +42,12 @@ class ApplyModelWithValidation(ApplyModel):
             raise ValueError("a and b must not be equal")
         return values
 
-    class Config:
-        validate_assignment = True
+    if PYDANTIC_V1:
+        class Config:
+            validate_assignment = True
+
+    if PYDANTIC_V2:
+        model_config = ConfigDict(validate_assignment=True)
 
 
 class PatchModel(pydantic.BaseModel):
