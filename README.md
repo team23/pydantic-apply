@@ -4,6 +4,10 @@
 
 Just use `pip install pydantic-apply` to install the library.
 
+**Note:** `pydantic-apply` is compatible with `pydantic` versions `1.9`, `1.10` and even `2.0` (🥳) on
+Python `3.8`, `3.9`, `3.10` and `3.11`. This is also ensured running all tests on all those versions
+using `tox`.
+
 ## About
 
 With `pydantic-apply` you can apply changes to your pydantic models by using
