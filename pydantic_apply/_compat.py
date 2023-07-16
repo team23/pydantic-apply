@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Set
+from typing import Any, Dict, Optional, Set, Type
 
 import pydantic
 from pydantic.fields import FieldInfo
@@ -10,11 +10,11 @@ PYDANTIC_V2 = PYDANTIC_VERSION.startswith("2.")
 
 if PYDANTIC_V1:  # pragma: no cover
     class PydanticCompat:  # noqa: F811
-        obj: Optional[pydantic.BaseModel]
+        obj: pydantic.BaseModel
 
         def __init__(
             self,
-            obj: Optional[pydantic.BaseModel] = None,
+            obj: pydantic.BaseModel,
         ) -> None:
             self.obj = obj
 
@@ -27,28 +27,28 @@ if PYDANTIC_V1:  # pragma: no cover
             return self.obj.__fields_set__
 
         def get_model_field_info_annotation(self, model_field: FieldInfo) -> type:
-            return model_field.type_
+            return model_field.type_  # type: ignore
 
         def get_model_config_value(self, key: str) -> Any:
-            return getattr(self.obj.__config__, key)
+            return getattr(self.obj.__config__, key)  # type: ignore
 
         def set_model_config_value(self, key: str, value: Any) -> None:
-            setattr(self.obj.__config__, key, value)
+            setattr(self.obj.__config__, key, value)  # type: ignore
 
         def model_copy(self, **kwargs: Any) -> pydantic.BaseModel:
             return self.obj.copy(**kwargs)
 
-        def model_dump(self, **kwargs: Any) -> pydantic.BaseModel:
+        def model_dump(self, **kwargs: Any) -> dict[str, Any]:
             return self.obj.dict(**kwargs)
 
 
-if PYDANTIC_V2:  # pragma: no cover
-    class PydanticCompat:  # noqa: F811
-        obj: Optional[pydantic.BaseModel]
+elif PYDANTIC_V2:  # pragma: no cover
+    class PydanticCompat:  # type: ignore
+        obj: pydantic.BaseModel
 
         def __init__(
             self,
-            obj: Optional[pydantic.BaseModel] = None,
+            obj: pydantic.BaseModel,
         ) -> None:
             self.obj = obj
 
@@ -60,17 +60,17 @@ if PYDANTIC_V2:  # pragma: no cover
         def __pydantic_fields_set__(self) -> Set[str]:
             return self.obj.__pydantic_fields_set__
 
-        def get_model_field_info_annotation(self, model_field: FieldInfo) -> type:
+        def get_model_field_info_annotation(self, model_field: FieldInfo) -> Optional[Type[Any]]:
             return model_field.annotation
 
         def get_model_config_value(self, key: str) -> Any:
             return self.obj.model_config.get(key, None)
 
         def set_model_config_value(self, key: str, value: Any) -> None:
-            self.obj.model_config[key] = value
+            self.obj.model_config[key] = value  # type: ignore
 
         def model_copy(self, **kwargs: Any) -> pydantic.BaseModel:
             return self.obj.model_copy(**kwargs)
 
-        def model_dump(self, **kwargs: Any) -> pydantic.BaseModel:
+        def model_dump(self, **kwargs: Any) -> dict[str, Any]:
             return self.obj.model_dump(**kwargs)
