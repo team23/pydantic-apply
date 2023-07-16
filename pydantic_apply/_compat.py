@@ -38,7 +38,7 @@ if PYDANTIC_V1:  # pragma: no cover
         def model_copy(self, **kwargs: Any) -> pydantic.BaseModel:
             return self.obj.copy(**kwargs)
 
-        def model_dump(self, **kwargs: Any) -> dict[str, Any]:
+        def model_dump(self, **kwargs: Any) -> Dict[str, Any]:
             return self.obj.dict(**kwargs)
 
 
@@ -72,5 +72,5 @@ elif PYDANTIC_V2:  # pragma: no cover
         def model_copy(self, **kwargs: Any) -> pydantic.BaseModel:
             return self.obj.model_copy(**kwargs)
 
-        def model_dump(self, **kwargs: Any) -> dict[str, Any]:
+        def model_dump(self, **kwargs: Any) -> Dict[str, Any]:
             return self.obj.model_dump(**kwargs)
