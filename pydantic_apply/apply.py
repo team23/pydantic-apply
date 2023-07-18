@@ -1,3 +1,4 @@
+import warnings
 from typing import Any, Dict, Union
 
 import pydantic
@@ -9,7 +10,7 @@ from pydantic_apply.utils import is_pydantic_apply_annotation
 class ApplyModelMixin(pydantic.BaseModel):
     """Mixin to allow models to apply partly changes to their data."""
 
-    def apply(
+    def model_apply(
         self,
         changes: Union[pydantic.BaseModel, Dict[str, Any]],
     ) -> None:
@@ -63,7 +64,7 @@ class ApplyModelMixin(pydantic.BaseModel):
                         current_value = PydanticCompat(current_value).model_copy()
 
                     # ...then use `.apply(...)` on the current value to prepare changes
-                    current_value.apply(changed_field_value)
+                    current_value.model_apply(changed_field_value)
                     prepared_changes[field_name] = current_value
                     continue
 
@@ -108,3 +109,13 @@ class ApplyModelMixin(pydantic.BaseModel):
             # Ensure whatever happens here, the validate_assignment flag is reset
             # to its original value.
             self_compat.set_model_config_value("validate_assignment", had_validate_assignment)
+
+    def apply(
+        self,
+        changes: Union[pydantic.BaseModel, Dict[str, Any]],
+    ) -> None:
+        warnings.warn(
+            "apply(...) is deprecated, use model_apply(...) instead",
+            DeprecationWarning,
+        )
+        self.model_apply(changes)
