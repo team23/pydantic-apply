@@ -25,7 +25,7 @@ class Something(ApplyModelMixin, pydantic.BaseModel):
 
 
 obj = Something(name='John Doe', age=42)
-obj.apply({
+obj.model_apply({
     "age": 43,
 })
 assert obj.age == 43
