@@ -117,5 +117,6 @@ class ApplyModelMixin(pydantic.BaseModel):
         warnings.warn(
             "apply(...) is deprecated, use model_apply(...) instead",
             DeprecationWarning,
+            stacklevel=2,
         )
         self.model_apply(changes)
