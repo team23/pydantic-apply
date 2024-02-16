@@ -1,5 +1,5 @@
 import warnings
-from typing import Any, Dict, Union
+from typing import Any, Dict, Union, cast
 
 import pydantic
 
@@ -64,7 +64,7 @@ class ApplyModelMixin(pydantic.BaseModel):
                         current_value = PydanticCompat(current_value).model_copy()
 
                     # ...then use `.apply(...)` on the current value to prepare changes
-                    current_value.model_apply(changed_field_value)
+                    cast(ApplyModelMixin, current_value).model_apply(changed_field_value)
                     prepared_changes[field_name] = current_value
                     continue
 

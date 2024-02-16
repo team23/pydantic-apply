@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Set, Type
+from typing import Any, Dict, Set, Type
 
 import pydantic
 from pydantic.fields import FieldInfo
@@ -9,7 +9,7 @@ PYDANTIC_V2 = PYDANTIC_VERSION.startswith("2.")
 
 
 if PYDANTIC_V1:  # pragma: no cover
-    class PydanticCompat:
+    class PydanticCompat:  # type: ignore
         obj: pydantic.BaseModel
 
         def __init__(
@@ -60,7 +60,9 @@ elif PYDANTIC_V2:  # pragma: no cover
         def __pydantic_fields_set__(self) -> Set[str]:
             return self.obj.__pydantic_fields_set__
 
-        def get_model_field_info_annotation(self, model_field: FieldInfo) -> Optional[Type[Any]]:
+        def get_model_field_info_annotation(self, model_field: FieldInfo) -> Type[Any]:
+            if model_field.annotation is None:
+                raise RuntimeError("model field has not typing annotation")
             return model_field.annotation
 
         def get_model_config_value(self, key: str) -> Any:
