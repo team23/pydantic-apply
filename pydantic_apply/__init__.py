@@ -1,1 +1,1 @@
-from .apply import ApplyModelMixin
+from .apply import ApplyModelMixin as ApplyModelMixin
