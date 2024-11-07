@@ -1,4 +1,4 @@
-from typing import Any, Dict, Set, Type
+from typing import Any
 
 import pydantic
 from pydantic.fields import FieldInfo
@@ -19,11 +19,11 @@ if PYDANTIC_V1:  # pragma: no cover
             self.obj = obj
 
         @property
-        def model_fields(self) -> Dict[str, FieldInfo]:
+        def model_fields(self) -> dict[str, FieldInfo]:
             return self.obj.__fields__
 
         @property
-        def __pydantic_fields_set__(self) -> Set[str]:
+        def __pydantic_fields_set__(self) -> set[str]:
             return self.obj.__fields_set__
 
         def get_model_field_info_annotation(self, model_field: FieldInfo) -> type:
@@ -38,7 +38,7 @@ if PYDANTIC_V1:  # pragma: no cover
         def model_copy(self, **kwargs: Any) -> pydantic.BaseModel:
             return self.obj.copy(**kwargs)
 
-        def model_dump(self, **kwargs: Any) -> Dict[str, Any]:
+        def model_dump(self, **kwargs: Any) -> dict[str, Any]:
             return self.obj.dict(**kwargs)
 
 
@@ -53,14 +53,14 @@ elif PYDANTIC_V2:  # pragma: no cover
             self.obj = obj
 
         @property
-        def model_fields(self) -> Dict[str, FieldInfo]:
+        def model_fields(self) -> dict[str, FieldInfo]:
             return self.obj.model_fields
 
         @property
-        def __pydantic_fields_set__(self) -> Set[str]:
+        def __pydantic_fields_set__(self) -> set[str]:
             return self.obj.__pydantic_fields_set__
 
-        def get_model_field_info_annotation(self, model_field: FieldInfo) -> Type[Any]:
+        def get_model_field_info_annotation(self, model_field: FieldInfo) -> type[Any]:
             if model_field.annotation is None:
                 raise RuntimeError("model field has not typing annotation")
             return model_field.annotation
@@ -74,5 +74,5 @@ elif PYDANTIC_V2:  # pragma: no cover
         def model_copy(self, **kwargs: Any) -> pydantic.BaseModel:
             return self.obj.model_copy(**kwargs)
 
-        def model_dump(self, **kwargs: Any) -> Dict[str, Any]:
+        def model_dump(self, **kwargs: Any) -> dict[str, Any]:
             return self.obj.model_dump(**kwargs)
