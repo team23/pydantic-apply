@@ -54,7 +54,7 @@ elif PYDANTIC_V2:  # pragma: no cover
 
         @property
         def model_fields(self) -> dict[str, FieldInfo]:
-            return self.obj.model_fields
+            return self.obj.__class__.model_fields
 
         @property
         def __pydantic_fields_set__(self) -> set[str]:
