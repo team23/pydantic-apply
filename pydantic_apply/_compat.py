@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from contextlib import contextmanager
 from typing import Any
 
@@ -44,7 +45,7 @@ if PYDANTIC_V1:  # pragma: no cover
             return self.obj.dict(**kwargs)
 
         @contextmanager
-        def disable_setattr_handler_cache(self) -> None:
+        def disable_setattr_handler_cache(self) -> Generator[None, Any, Any]:
             yield
 
 
@@ -84,12 +85,13 @@ elif PYDANTIC_V2:  # pragma: no cover
             return self.obj.model_dump(**kwargs)
 
         @contextmanager
-        def disable_setattr_handler_cache(self) -> None:
+        def disable_setattr_handler_cache(self) -> Generator[None, Any, Any]:
+            old_setattr_handlers = {}
             if Version(PYDANTIC_VERSION) >= Version("2.11"):
                 old_setattr_handlers = self.obj.__pydantic_setattr_handlers__
-                self.obj.__pydantic_setattr_handlers__ = {}
+                self.obj.__class__.__pydantic_setattr_handlers__ = {}
 
             yield
 
             if Version(PYDANTIC_VERSION) >= Version("2.11"):
-                self.obj.__pydantic_setattr_handlers__ = old_setattr_handlers
+                self.obj.__class__.__pydantic_setattr_handlers__ = old_setattr_handlers
