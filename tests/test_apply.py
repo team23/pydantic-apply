@@ -57,6 +57,28 @@ class ApplyModelWithValidation(ApplyModel):
         model_config = ConfigDict(validate_assignment=True)
 
 
+class ApplyModelWithAfterValidation(ApplyModel):
+    if PYDANTIC_V1:
+        @pydantic.root_validator()
+        def _validate(cls, values):
+            if values.get("a", None) == values.get("b", None):
+                raise ValueError("a and b must not be equal")
+            return values
+    if PYDANTIC_V2:
+        @pydantic.model_validator(mode="after")
+        def _validate(self):
+            if self.a == self.b:
+                raise ValueError("a and b must not be equal")
+            return self
+
+    if PYDANTIC_V1:
+        class Config:
+            validate_assignment = True
+
+    if PYDANTIC_V2:
+        model_config = ConfigDict(validate_assignment=True)
+
+
 class PatchModel(pydantic.BaseModel):
     a: Optional[int] = None
     b: Optional[int] = None
@@ -111,6 +133,17 @@ def test_apply_will_handle_validate_assignment():
 
     assert obj.a == 2
     assert obj.b == 1
+
+
+def test_apply_will_handle_validate_assignment_after_direct_access():
+    obj = ApplyModelWithAfterValidation(a=1, b=2)
+    obj.a = 3
+    obj.b = 4
+
+    obj.model_apply({"a": 4, "b": 3})
+
+    assert obj.a == 4
+    assert obj.b == 3
 
 
 def test_apply_will_handle_trigger_errors_with_validate_assignment():
