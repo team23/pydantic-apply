@@ -103,7 +103,8 @@ class ApplyModelMixin(pydantic.BaseModel):
                 }
 
             for field_name, field_value in prepared_changes.items():
-                setattr(self, field_name, field_value)
+                with self_compat.disable_setattr_handler_cache():
+                    setattr(self, field_name, field_value)
 
         finally:
             # Ensure whatever happens here, the validate_assignment flag is reset
