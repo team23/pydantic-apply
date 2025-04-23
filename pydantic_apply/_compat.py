@@ -1,5 +1,5 @@
 from typing import Any
-from contextlib import contextmanger
+from contextlib import contextmanager
 from packaging.version import Version
 
 import pydantic
@@ -43,7 +43,7 @@ if PYDANTIC_V1:  # pragma: no cover
         def model_dump(self, **kwargs: Any) -> dict[str, Any]:
             return self.obj.dict(**kwargs)
 
-        @contextmanger
+        @contextmanager
         def disable_setattr_handler_cache(self) -> None:
             yield
 
@@ -83,7 +83,7 @@ elif PYDANTIC_V2:  # pragma: no cover
         def model_dump(self, **kwargs: Any) -> dict[str, Any]:
             return self.obj.model_dump(**kwargs)
 
-        @contextmanger
+        @contextmanager
         def disable_setattr_handler_cache(self) -> None:
             if Version(PYDANTIC_VERSION) >= Version("2.11"):
                 old_setattr_handlers = self.obj.__pydantic_setattr_handlers__
