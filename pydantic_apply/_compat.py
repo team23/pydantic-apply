@@ -1,8 +1,8 @@
-from typing import Any
 from contextlib import contextmanager
-from packaging.version import Version
+from typing import Any
 
 import pydantic
+from packaging.version import Version
 from pydantic.fields import FieldInfo
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
@@ -93,4 +93,3 @@ elif PYDANTIC_V2:  # pragma: no cover
 
             if Version(PYDANTIC_VERSION) >= Version("2.11"):
                 self.obj.__pydantic_setattr_handlers__ = old_setattr_handlers
-
