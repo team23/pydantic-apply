@@ -88,7 +88,7 @@ elif PYDANTIC_V2:  # pragma: no cover
         def disable_setattr_handler_cache(self) -> Generator[None, Any, Any]:
             old_setattr_handlers = {}
             if Version(PYDANTIC_VERSION) >= Version("2.11"):
-                old_setattr_handlers = self.obj.__pydantic_setattr_handlers__
+                old_setattr_handlers = self.obj.__class__.__pydantic_setattr_handlers__
                 self.obj.__class__.__pydantic_setattr_handlers__ = {}
 
             yield
