@@ -178,8 +178,8 @@ def test_apply_will_handle_inner_apply_model():
 
 
 def test_apply_will_handle_inner_apply_model_with_validate_assignment():
-    obj = ApplyModelWithValidation(a=1, b=2, inner_with_apply=InnerWithApplyModel(a=1))
-    inner_with_apply = obj.inner_with_apply
+    inner_with_apply = InnerWithApplyModel(a=1)
+    obj = ApplyModelWithValidation(a=1, b=2, inner_with_apply=inner_with_apply)
 
     obj.model_apply({
         "inner_with_apply": PatchModel(b=1),
