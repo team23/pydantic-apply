@@ -9,6 +9,7 @@ from pydantic.version import VERSION as PYDANTIC_VERSION
 
 PYDANTIC_V1 = PYDANTIC_VERSION.startswith("1.")
 PYDANTIC_V2 = PYDANTIC_VERSION.startswith("2.")
+PYDANTIC_GE_V2_11 = Version(PYDANTIC_VERSION) >= Version("2.11")
 
 
 if PYDANTIC_V1:  # pragma: no cover
@@ -83,15 +84,3 @@ elif PYDANTIC_V2:  # pragma: no cover
 
         def model_dump(self, **kwargs: Any) -> dict[str, Any]:
             return self.obj.model_dump(**kwargs)
-
-        @contextmanager
-        def disable_setattr_handler_cache(self) -> Generator[None, Any, Any]:
-            old_setattr_handlers = {}
-            if Version(PYDANTIC_VERSION) >= Version("2.11"):
-                old_setattr_handlers = self.obj.__class__.__pydantic_setattr_handlers__
-                self.obj.__class__.__pydantic_setattr_handlers__ = {}
-
-            yield
-
-            if Version(PYDANTIC_VERSION) >= Version("2.11"):
-                self.obj.__class__.__pydantic_setattr_handlers__ = old_setattr_handlers
