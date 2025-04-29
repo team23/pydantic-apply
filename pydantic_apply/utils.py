@@ -120,7 +120,7 @@ def reset_setattr_handler_cache(
 def assignment_validation_context(
     self_compat: PydanticCompat,
     prepared_changes: dict[str, Any],
-) -> None:
+) -> Generator[None, None, None]:
     """
     Context for assigning values.
 
