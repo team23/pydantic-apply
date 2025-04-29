@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from contextlib import contextmanager
 from typing import Any, Union, get_args, get_origin
 
