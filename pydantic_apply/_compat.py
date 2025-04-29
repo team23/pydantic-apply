@@ -1,5 +1,3 @@
-from collections.abc import Generator
-from contextlib import contextmanager
 from typing import Any
 
 import pydantic
@@ -44,10 +42,6 @@ if PYDANTIC_V1:  # pragma: no cover
 
         def model_dump(self, **kwargs: Any) -> dict[str, Any]:
             return self.obj.dict(**kwargs)
-
-        @contextmanager
-        def disable_setattr_handler_cache(self) -> Generator[None, Any, Any]:
-            yield
 
 
 elif PYDANTIC_V2:  # pragma: no cover
