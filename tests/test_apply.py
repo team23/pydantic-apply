@@ -136,10 +136,18 @@ def test_apply_will_handle_validate_assignment():
 
 
 def test_apply_will_handle_validate_assignment_after_direct_access():
+    """
+    Test that model_apply works with initialized setattr cache.
+
+    This is only necessary starting from pydantic v2.11, since when
+    setattr uses a chache which stores the validate_assignment setting.
+    """
+
     obj = ApplyModelWithAfterValidation(a=1, b=2)
-    obj.a = 3
+    obj.a = 3  # First apply both values to initialize __pydantic_setattr_handlers__
     obj.b = 4
 
+    # model_apply temporarily needs to disable the cache to skip the assignment validation
     obj.model_apply({"a": 4, "b": 3})
 
     assert obj.a == 4
