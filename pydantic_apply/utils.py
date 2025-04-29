@@ -126,9 +126,7 @@ def assignment_validation_context(
 
     This context handles assigning multiple values at once while providing
     compatibility across pydantic versions.
-    Since this requires some temporary changes, we need to reset
-    everything in the __exit__ method, which is also the reason
-    why this is not a simple contextmanager method.
+    This requires some temporary changes, we need to reset on exit.
     """
 
     old_prepared_changes = prepared_changes
