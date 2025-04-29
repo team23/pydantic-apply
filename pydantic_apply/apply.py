@@ -71,8 +71,8 @@ class ApplyModelMixin(pydantic.BaseModel):
             # Default apply: Just set new value
             prepared_changes[field_name] = changed_field_value
 
-        with assignment_validation_context(self_compat, prepared_changes):
-            for field_name, field_value in prepared_changes.items():
+        with assignment_validation_context(self_compat, prepared_changes) as changes_in_context:
+            for field_name, field_value in changes_in_context.items():
                 setattr(self, field_name, field_value)
 
     def apply(
