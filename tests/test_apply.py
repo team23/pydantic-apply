@@ -3,11 +3,7 @@ from typing import Optional
 import pydantic
 import pytest
 
-from pydantic_apply._compat import PYDANTIC_V1, PYDANTIC_V2
 from pydantic_apply.apply import ApplyModelMixin
-
-if PYDANTIC_V2:
-    from pydantic import ConfigDict
 
 
 class InnerModel(pydantic.BaseModel):
@@ -27,56 +23,27 @@ class ApplyModel(ApplyModelMixin, pydantic.BaseModel):
     inner: Optional[InnerModel] = None
     inner_with_apply: Optional[InnerWithApplyModel] = None
 
-    if PYDANTIC_V1:
-        class Config:
-            allow_population_by_field_name = True
-
-    if PYDANTIC_V2:
-        model_config = ConfigDict(populate_by_name=True)
+    model_config = pydantic.ConfigDict(populate_by_name=True)
 
 
 class ApplyModelWithValidation(ApplyModel):
-    if PYDANTIC_V1:
-        @pydantic.root_validator(pre=True)
-        def _validate(cls, values):
-            if values.get("a", None) == values.get("b", None):
-                raise ValueError("a and b must not be equal")
-            return values
-    if PYDANTIC_V2:
-        @pydantic.model_validator(mode="before")
-        def _validate(cls, data):
-            if data.get("a", None) == data.get("b", None):
-                raise ValueError("a and b must not be equal")
-            return data
+    @pydantic.model_validator(mode="before")
+    def _validate(cls, data):
+        if data.get("a", None) == data.get("b", None):
+            raise ValueError("a and b must not be equal")
+        return data
 
-    if PYDANTIC_V1:
-        class Config:
-            validate_assignment = True
-
-    if PYDANTIC_V2:
-        model_config = ConfigDict(validate_assignment=True)
+    model_config = pydantic.ConfigDict(validate_assignment=True)
 
 
 class ApplyModelWithAfterValidation(ApplyModel):
-    if PYDANTIC_V1:
-        @pydantic.root_validator()
-        def _validate(cls, values):
-            if values.get("a", None) == values.get("b", None):
-                raise ValueError("a and b must not be equal")
-            return values
-    if PYDANTIC_V2:
-        @pydantic.model_validator(mode="after")
-        def _validate(self):
-            if self.a == self.b:
-                raise ValueError("a and b must not be equal")
-            return self
+    @pydantic.model_validator(mode="after")
+    def _validate(self):
+        if self.a == self.b:
+            raise ValueError("a and b must not be equal")
+        return self
 
-    if PYDANTIC_V1:
-        class Config:
-            validate_assignment = True
-
-    if PYDANTIC_V2:
-        model_config = ConfigDict(validate_assignment=True)
+    model_config = pydantic.ConfigDict(validate_assignment=True)
 
 
 class PatchModel(pydantic.BaseModel):

@@ -3,7 +3,6 @@ from typing import Any, Union, cast
 
 import pydantic
 
-from pydantic_apply._compat import PydanticCompat
 from pydantic_apply.utils import assignment_validation_context, is_pydantic_apply_annotation
 
 
@@ -16,7 +15,6 @@ class ApplyModelMixin(pydantic.BaseModel):
     ) -> None:
         """Apply (partly) changes to the model data."""
 
-        self_compat = PydanticCompat(self)
 
         if isinstance(changes, pydantic.BaseModel):
             # Convert model to dict. Do not use `changes.model_dump()` because it
@@ -25,12 +23,12 @@ class ApplyModelMixin(pydantic.BaseModel):
                 key: value
                 for key, value
                 in changes.__dict__.items()
-                if key in PydanticCompat(changes).__pydantic_fields_set__
+                if key in changes.__pydantic_fields_set__
             }
 
         # Prepare the changes
         prepared_changes = {}
-        for field_name, model_field in self_compat.model_fields.items():
+        for field_name, model_field in self.model_fields.items():
             # Make sure the field exists in the changes and
             # get changed field value
             if field_name in changes:
@@ -43,7 +41,9 @@ class ApplyModelMixin(pydantic.BaseModel):
 
             # Handle ApplyModelMixin fields:
             # Field type must be ApplyModelMixin....
-            field_annotation = self_compat.get_model_field_info_annotation(model_field)
+            field_annotation = model_field.annotation
+            if field_annotation is None:
+                raise RuntimeError("model field has not typing annotation")
 
             if is_pydantic_apply_annotation(field_annotation):
                 current_value = getattr(self, field_name)
@@ -60,8 +60,8 @@ class ApplyModelMixin(pydantic.BaseModel):
                     # When validation on assignment is enabled we need to
                     # copy the current value first. Otherwise, the validation
                     # might have issues, see below.
-                    if self_compat.get_model_config_value("validate_assignment"):
-                        current_value = PydanticCompat(current_value).model_copy()
+                    if self.model_config.get("validate_assignment", None):
+                        current_value = current_value.model_copy()
 
                     # ...then use `.apply(...)` on the current value to prepare changes
                     cast(ApplyModelMixin, current_value).model_apply(changed_field_value)
@@ -71,7 +71,7 @@ class ApplyModelMixin(pydantic.BaseModel):
             # Default apply: Just set new value
             prepared_changes[field_name] = changed_field_value
 
-        with assignment_validation_context(self_compat, prepared_changes) as changes_in_context:
+        with assignment_validation_context(self, prepared_changes) as changes_in_context:
             for field_name, field_value in changes_in_context.items():
                 setattr(self, field_name, field_value)
 
