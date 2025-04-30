@@ -34,7 +34,7 @@ def is_pydantic_apply_annotation(annotation: type) -> bool:
 def assignment_validation_context(
     self_compat: PydanticCompat,
     prepared_changes: dict[str, Any],
-) -> Generator[None, None, None]:
+) -> Generator[dict[str, Any], None, None]:
     """
     Context for assigning values.
 
