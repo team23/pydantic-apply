@@ -88,7 +88,8 @@ def assignment_validation_context(
 
     finally:
         # Reset `validate_assignment` to its original state
-        obj.model_config["validate_assignment"] = had_validate_assignment
+        if had_validate_assignment is not None:
+            obj.model_config["validate_assignment"] = had_validate_assignment
 
         # Reset the setattr handler cache
         if PYDANTIC_GE_V2_11:
