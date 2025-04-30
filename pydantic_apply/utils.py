@@ -2,9 +2,11 @@ from collections.abc import Generator
 from contextlib import contextmanager
 from typing import Any, Union, get_args, get_origin
 
+import pydantic
+
 import pydantic_apply
 
-from ._compat import PYDANTIC_GE_V2_11, PydanticCompat
+from ._compat import PYDANTIC_GE_V2_11
 
 
 def is_pydantic_apply_annotation(annotation: type) -> bool:
@@ -32,7 +34,7 @@ def is_pydantic_apply_annotation(annotation: type) -> bool:
 
 @contextmanager
 def assignment_validation_context(
-    self_compat: PydanticCompat,
+    obj: pydantic.BaseModel,
     prepared_changes: dict[str, Any],
 ) -> Generator[dict[str, Any], None, None]:
     """
@@ -43,7 +45,7 @@ def assignment_validation_context(
     This requires some temporary changes, we need to reset on exit.
     """
 
-    had_validate_assignment = self_compat.get_model_config_value("validate_assignment")
+    had_validate_assignment = obj.model_config.get("validate_assignment", None)
     old_setattr_handlers = {}
 
     try:
@@ -54,14 +56,14 @@ def assignment_validation_context(
             # the fields one by one, the validators may fail as the temporary
             # combination of two values will not validate. But the validator might
             # have passed when we would have had the chance to set both values.
-            self_compat.set_model_config_value("validate_assignment", False)
+            obj.model_config["validate_assignment"] = False
 
             # Run validation as if all changes were applied. We do this by creating
             # a new (temporary) instance of the model class, just to run the
             # validation.
-            changed_self = self_compat.obj.__class__(
+            changed_self = obj.__class__(
                 **{
-                    **self_compat.model_dump(),
+                    **obj.model_dump(),
                     **prepared_changes,
                 },
             )
@@ -79,15 +81,16 @@ def assignment_validation_context(
         # This is needed, because otherwise assigning multiple attributes could fail
         # if the respective validators already have been initialized.
         if PYDANTIC_GE_V2_11:
-            old_setattr_handlers = self_compat.obj.__class__.__pydantic_setattr_handlers__
-            self_compat.obj.__class__.__pydantic_setattr_handlers__ = {}
+            old_setattr_handlers = obj.__class__.__pydantic_setattr_handlers__
+            obj.__class__.__pydantic_setattr_handlers__ = {}
 
         yield prepared_changes
 
     finally:
         # Reset `validate_assignment` to its original state
-        self_compat.set_model_config_value("validate_assignment", had_validate_assignment)
+        if had_validate_assignment:
+            obj.model_config["validate_assignment"] = had_validate_assignment
 
         # Reset the setattr handler cache
         if PYDANTIC_GE_V2_11:
-            self_compat.obj.__class__.__pydantic_setattr_handlers__ = old_setattr_handlers
+            obj.__class__.__pydantic_setattr_handlers__ = old_setattr_handlers
