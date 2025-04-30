@@ -1,11 +1,13 @@
 from typing import Any
 
 import pydantic
+from packaging.version import Version
 from pydantic.fields import FieldInfo
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
 PYDANTIC_V1 = PYDANTIC_VERSION.startswith("1.")
 PYDANTIC_V2 = PYDANTIC_VERSION.startswith("2.")
+PYDANTIC_GE_V2_11 = Version(PYDANTIC_VERSION) >= Version("2.11")
 
 
 if PYDANTIC_V1:  # pragma: no cover

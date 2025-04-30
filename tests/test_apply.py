@@ -57,6 +57,28 @@ class ApplyModelWithValidation(ApplyModel):
         model_config = ConfigDict(validate_assignment=True)
 
 
+class ApplyModelWithAfterValidation(ApplyModel):
+    if PYDANTIC_V1:
+        @pydantic.root_validator()
+        def _validate(cls, values):
+            if values.get("a", None) == values.get("b", None):
+                raise ValueError("a and b must not be equal")
+            return values
+    if PYDANTIC_V2:
+        @pydantic.model_validator(mode="after")
+        def _validate(self):
+            if self.a == self.b:
+                raise ValueError("a and b must not be equal")
+            return self
+
+    if PYDANTIC_V1:
+        class Config:
+            validate_assignment = True
+
+    if PYDANTIC_V2:
+        model_config = ConfigDict(validate_assignment=True)
+
+
 class PatchModel(pydantic.BaseModel):
     a: Optional[int] = None
     b: Optional[int] = None
@@ -113,6 +135,25 @@ def test_apply_will_handle_validate_assignment():
     assert obj.b == 1
 
 
+def test_apply_will_handle_validate_assignment_after_direct_access():
+    """
+    Test that model_apply works with initialized setattr cache.
+
+    This is only necessary starting from pydantic v2.11, since when
+    setattr uses a chache which stores the validate_assignment setting.
+    """
+
+    obj = ApplyModelWithAfterValidation(a=1, b=2)
+    obj.a = 3  # First apply both values to initialize __pydantic_setattr_handlers__
+    obj.b = 4
+
+    # model_apply temporarily needs to disable the cache to skip the assignment validation
+    obj.model_apply({"a": 4, "b": 3})
+
+    assert obj.a == 4
+    assert obj.b == 3
+
+
 def test_apply_will_handle_trigger_errors_with_validate_assignment():
     obj = ApplyModelWithValidation(a=1, b=2)
 
@@ -146,6 +187,7 @@ def test_apply_will_handle_inner_apply_model():
 
 def test_apply_will_handle_inner_apply_model_with_validate_assignment():
     obj = ApplyModelWithValidation(a=1, b=2, inner_with_apply=InnerWithApplyModel(a=1))
+    # Get the value of inner_with_apply afterwards because it might already have changed once
     inner_with_apply = obj.inner_with_apply
 
     obj.model_apply({

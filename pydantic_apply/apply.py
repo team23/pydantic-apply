@@ -4,7 +4,7 @@ from typing import Any, Union, cast
 import pydantic
 
 from pydantic_apply._compat import PydanticCompat
-from pydantic_apply.utils import is_pydantic_apply_annotation
+from pydantic_apply.utils import assignment_validation_context, is_pydantic_apply_annotation
 
 
 class ApplyModelMixin(pydantic.BaseModel):
@@ -71,44 +71,9 @@ class ApplyModelMixin(pydantic.BaseModel):
             # Default apply: Just set new value
             prepared_changes[field_name] = changed_field_value
 
-        # Apply changes
-        had_validate_assignment = self_compat.get_model_config_value("validate_assignment")
-        try:
-            if had_validate_assignment:
-                # Disable validation on assignment so we can apply the whole set of
-                # changes without validation problems while the data changes. This
-                # is necessary as validators may depend on other fields. When we change
-                # the fields one by one, the validators may fail as the temporary
-                # combination of two values will not validate. But the validator might
-                # have passed when we would have had the chance to set both values.
-                self_compat.set_model_config_value("validate_assignment", False)
-
-                # Run validation as if all changes were applied. We do this by creating
-                # a new (temporary) instance of the model class, just to run the
-                # validation.
-                changed_self = self.__class__(
-                    **{
-                        **self_compat.model_dump(),
-                        **prepared_changes,
-                    },
-                )
-
-                # Update the changes with the validated values we now have from the
-                # temporary instance.
-                prepared_changes = {
-                    key: value
-                    for key, value
-                    in changed_self.__dict__.items()
-                    if key in prepared_changes.keys()
-                }
-
-            for field_name, field_value in prepared_changes.items():
+        with assignment_validation_context(self_compat, prepared_changes) as changes_in_context:
+            for field_name, field_value in changes_in_context.items():
                 setattr(self, field_name, field_value)
-
-        finally:
-            # Ensure whatever happens here, the validate_assignment flag is reset
-            # to its original value.
-            self_compat.set_model_config_value("validate_assignment", had_validate_assignment)
 
     def apply(
         self,
