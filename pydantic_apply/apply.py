@@ -28,7 +28,7 @@ class ApplyModelMixin(pydantic.BaseModel):
 
         # Prepare the changes
         prepared_changes = {}
-        for field_name, model_field in self.model_fields.items():
+        for field_name, model_field in self.__class__.model_fields.items():
             # Make sure the field exists in the changes and
             # get changed field value
             if field_name in changes:
