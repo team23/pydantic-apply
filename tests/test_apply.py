@@ -170,7 +170,7 @@ def test_apply_will_handle_inner_apply_model_with_validate_assignment():
 def test_apply_compatibility_works():
     obj = ApplyModel(a=1, b=2)
 
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning):  # noqa: PT030
         obj.apply({"a": 2})
 
     assert obj.a == 2
