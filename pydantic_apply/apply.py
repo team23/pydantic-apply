@@ -1,5 +1,5 @@
 import warnings
-from typing import Any, Union, cast
+from typing import Any, cast
 
 import pydantic
 
@@ -11,7 +11,7 @@ class ApplyModelMixin(pydantic.BaseModel):
 
     def model_apply(
         self,
-        changes: Union[pydantic.BaseModel, dict[str, Any]],
+        changes: pydantic.BaseModel | dict[str, Any],
     ) -> None:
         """Apply (partly) changes to the model data."""
 
@@ -77,7 +77,7 @@ class ApplyModelMixin(pydantic.BaseModel):
 
     def apply(
         self,
-        changes: Union[pydantic.BaseModel, dict[str, Any]],
+        changes: pydantic.BaseModel | dict[str, Any],
     ) -> None:
         warnings.warn(
             "apply(...) is deprecated, use model_apply(...) instead",

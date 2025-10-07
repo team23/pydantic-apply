@@ -7,21 +7,21 @@ from pydantic_apply.apply import ApplyModelMixin
 
 
 class InnerModel(pydantic.BaseModel):
-    a: Optional[int] = None
-    b: Optional[int] = None
+    a: int | None = None
+    b: int | None = None
 
 
 class InnerWithApplyModel(ApplyModelMixin, pydantic.BaseModel):
-    a: Optional[int] = None
-    b: Optional[int] = None
+    a: int | None = None
+    b: int | None = None
 
 
 class ApplyModel(ApplyModelMixin, pydantic.BaseModel):
     a: int = pydantic.Field(..., alias="aliasA")
     b: int = pydantic.Field(..., alias="aliasB")
 
-    inner: Optional[InnerModel] = None
-    inner_with_apply: Optional[InnerWithApplyModel] = None
+    inner: InnerModel | None = None
+    inner_with_apply: InnerWithApplyModel | None = None
 
     model_config = pydantic.ConfigDict(populate_by_name=True)
 
@@ -47,8 +47,8 @@ class ApplyModelWithAfterValidation(ApplyModel):
 
 
 class PatchModel(pydantic.BaseModel):
-    a: Optional[int] = None
-    b: Optional[int] = None
+    a: int | None = None
+    b: int | None = None
 
 
 def test_apply_with_dict():

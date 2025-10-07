@@ -1,5 +1,6 @@
 from collections.abc import Generator
 from contextlib import contextmanager
+from types import UnionType
 from typing import Any, Union, get_args, get_origin
 
 import pydantic
@@ -9,7 +10,7 @@ import pydantic_apply
 from ._compat import PYDANTIC_GE_V2_11
 
 
-def is_pydantic_apply_annotation(annotation: type) -> bool:
+def is_pydantic_apply_annotation(annotation: type | UnionType) -> bool:
     """Returns True if the given annotation is a ApplyModelMixin annotation."""
 
     # if annotation is an ApplyModelMixin everything is easy
@@ -21,7 +22,7 @@ def is_pydantic_apply_annotation(annotation: type) -> bool:
 
     # Otherwise we may need to handle typing arguments
     origin = get_origin(annotation)
-    if origin is Union:
+    if origin is Union or origin is UnionType:
         # Note: This includes Optional, as Optional[...] is just Union[..., None]
         return any(
             is_pydantic_apply_annotation(arg)

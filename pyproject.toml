@@ -1,26 +1,30 @@
-[tool.poetry]
+[project]
 name = "pydantic-apply"
 version = "0.7.1"
-description = "Apply changes as patches to pydanic models."
-authors = ["TEAM23 GmbH <info@team23.de>"]
+description = "Apply changes as patches to pydantic models."
+authors = [{ name = "TEAM23 GmbH", email = "info@team23.de" }]
 license = "MIT"
-repository = "https://github.com/team23/pydantic-apply"
 readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.0.0,<3.0.0",
+]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-pydantic = ">=2.0.0,<3.0.0"
+[project.urls]
+Repository = "https://github.com/team23/pydantic-apply"
 
-[tool.poetry.group.dev.dependencies]
-pytest = ">=7.1.2,<9.0.0"
-pytest-cov = ">=3,<8"
-tox = ">=3.26,<5.0"
-ruff = ">=0.5.0,<0.14.0"
-pyright = ">=1.1.350,<1.2"
+[dependency-groups]
+dev = [
+    "pytest>=7.1.2,<9.0.0",
+    "pytest-cov>=3,<8",
+    "tox>=3.26,<5.0",
+    "ruff>=0.5.0,<0.14.0",
+    "pyright>=1.1.350,<1.2",
+]
 
 [tool.ruff]
 line-length = 115
-target-version = "py39"
+target-version = "py310"
 output-format = "grouped"
 
 [tool.ruff.lint]
@@ -33,5 +37,9 @@ ignore = ["A001","A002","A003","ANN401","C901","N8","B008","F405","F821"]
 "test_*.py" = ["S101","ANN","F401"]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.8.22,<0.9.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "pydantic_apply"
+module-root = ""
