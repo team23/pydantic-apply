@@ -4,6 +4,7 @@ version = "0.8.0"
 description = "Apply changes as patches to pydantic models."
 authors = [{ name = "TEAM23 GmbH", email = "info@team23.de" }]
 license = "MIT"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
