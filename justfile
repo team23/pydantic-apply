@@ -36,8 +36,6 @@ pyright *args: (uv "run" "pyright" "pydantic_apply" args)
 
 lint: ruff pyright
 
-publish: (uv "publish" "--build")
-
 release version: (uv "version" version)
     git add pyproject.toml
     git commit -m "release: 🔖 v$(uv version --short)" --no-verify
